@@ -1,37 +1,33 @@
+use crate::AdventDay;
 use std::collections::HashSet;
 use std::fs;
-use crate::AdventDay;
 
 pub struct DayOne();
 
 impl AdventDay for DayOne {
     fn run_part_one(&self) {
-        let contents = fs::read_to_string("./data/day01.txt")
-            .expect("The input file was missing");
-        let frequencies = contents.split("\n")
-            .filter(|&line| line != "");
+        let contents = fs::read_to_string("./data/day01.txt").expect("The input file was missing");
+        let frequencies = contents.split("\n").filter(|&line| line != "");
         println!("Answer: {}", sum_frequencies(frequencies));
     }
 
     fn run_part_two(&self) {
-        let contents = fs::read_to_string("./data/day01.txt")
-            .expect("The input file was missing");
-        let frequencies = contents.split("\n")
-            .filter(|&line| line != "");
+        let contents = fs::read_to_string("./data/day01.txt").expect("The input file was missing");
+        let frequencies = contents.split("\n").filter(|&line| line != "");
         println!("Answer: {}", repeated_total(frequencies).unwrap());
     }
 }
 
 fn sum_frequencies<'a, T>(frequencies: T) -> i64
-    where
-        T: Iterator<Item = &'a str>
+where
+    T: Iterator<Item = &'a str>,
 {
     frequencies.map(convert_to_int).sum()
 }
 
 fn repeated_total<'a, T>(frequencies: T) -> Option<i64>
-    where
-        T: Iterator<Item = &'a str> + Clone
+where
+    T: Iterator<Item = &'a str> + Clone,
 {
     let running_totals = frequencies
         .map(convert_to_int)

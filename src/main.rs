@@ -1,6 +1,6 @@
-use std::env;
-use adventofcode2018_reattempt::AdventDay;
 use adventofcode2018_reattempt::day_01::DayOne;
+use adventofcode2018_reattempt::AdventDay;
+use std::env;
 
 fn main() {
     println!("Hello, advent of code");
@@ -12,7 +12,6 @@ fn main() {
         "01" => run_day(&DayOne(), part),
         _ => panic!("That day has not been done"),
     };
-
 }
 
 fn run_day(solution: &dyn AdventDay, part: &str) {
