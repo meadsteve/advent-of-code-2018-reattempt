@@ -8,8 +8,7 @@ impl AdventDay for DayOne {
         let contents = fs::read_to_string("./data/day01.txt")
             .expect("The input file was missing");
         let frequencies = contents.split("\n")
-            .filter(|&line| line != "")
-            .collect();
+            .filter(|&line| line != "");
         println!("Answer: {}", sum_frequencies(frequencies));
     }
 
@@ -18,11 +17,14 @@ impl AdventDay for DayOne {
     }
 }
 
-fn sum_frequencies(frequencies: Vec<&str>) -> i64 {
-    frequencies.iter().map(convert_to_int).sum()
+fn sum_frequencies<'a, T>(frequencies: T) -> i64
+    where
+        T: Iterator<Item = &'a str>
+{
+    frequencies.map(convert_to_int).sum()
 }
 
-fn convert_to_int(freq: &&str) -> i64 {
+fn convert_to_int(freq: &str) -> i64 {
     if freq.starts_with("+") {
         freq[1..].parse::<i64>().unwrap()
     } else {
@@ -37,7 +39,7 @@ mod tests {
     #[test]
     fn it_works_for_a_list_of_frequency_strings() {
         let input = vec!["+1", "+3", "-2"];
-        let sum = sum_frequencies(input);
+        let sum = sum_frequencies(input.into_iter());
         assert_eq!(sum, 2);
     }
 }
