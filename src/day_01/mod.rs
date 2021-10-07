@@ -1,4 +1,4 @@
-use crate::AdventDay;
+use crate::{lines_from_file, AdventDay};
 use std::collections::HashSet;
 use std::fs;
 
@@ -6,8 +6,8 @@ pub struct DayOne();
 
 impl AdventDay for DayOne {
     fn run_part_one(&self) {
-        let contents = fs::read_to_string("./data/day01.txt").expect("The input file was missing");
-        let frequencies = contents.split('\n').filter(|&line| !line.is_empty());
+        let lines = lines_from_file("./data/day01.txt");
+        let frequencies = lines.iter();
         println!("Answer: {}", sum_frequencies(frequencies));
     }
 
