@@ -7,3 +7,6 @@ edition = "2018"
 
 [dependencies]
 rayon = "1.5"
+
+[dev-dependencies]
+
