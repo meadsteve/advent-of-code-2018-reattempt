@@ -7,13 +7,13 @@ pub struct DayOne();
 impl AdventDay for DayOne {
     fn run_part_one(&self) {
         let contents = fs::read_to_string("./data/day01.txt").expect("The input file was missing");
-        let frequencies = contents.split("\n").filter(|&line| line != "");
+        let frequencies = contents.split('\n').filter(|&line| !line.is_empty());
         println!("Answer: {}", sum_frequencies(frequencies));
     }
 
     fn run_part_two(&self) {
         let contents = fs::read_to_string("./data/day01.txt").expect("The input file was missing");
-        let frequencies = contents.split("\n").filter(|&line| line != "");
+        let frequencies = contents.split('\n').filter(|&line| !line.is_empty());
         println!("Answer: {}", repeated_total(frequencies).unwrap());
     }
 }
@@ -33,7 +33,7 @@ where
         .map(convert_to_int)
         .cycle()
         .scan(0, |total, freq| {
-            *total = *total + freq;
+            *total += freq;
             Some(*total)
         });
     let mut previous_totals = HashSet::new();
@@ -47,10 +47,12 @@ where
 }
 
 fn convert_to_int(freq: &str) -> i64 {
-    if freq.starts_with("+") {
-        freq[1..].parse::<i64>().unwrap()
+    if let Some(value) = freq.strip_prefix('+') {
+        value.parse::<i64>().unwrap()
+    } else if let Some(value) = freq.strip_prefix('-') {
+        -value.parse::<i64>().unwrap()
     } else {
-        freq[1..].parse::<i64>().unwrap() * -1
+        panic!("The value didn't start with + or -")
     }
 }
 

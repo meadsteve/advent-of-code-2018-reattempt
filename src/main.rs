@@ -15,7 +15,7 @@ fn main() {
 }
 
 fn run_day(solution: &dyn AdventDay, part: &str) {
-    match &part[..] {
+    match part {
         "01" => solution.run_part_one(),
         "02" => solution.run_part_two(),
         _ => panic!("Day must be 01 or 02"),
