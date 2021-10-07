@@ -2,17 +2,20 @@ use crate::helpers::DayData;
 use crate::AdventDay;
 use std::collections::HashMap;
 
+use rayon::prelude::*;
+
 pub struct DayTwo();
 
 impl AdventDay for DayTwo {
     fn run_part_one(&self) {
-        let lines = DayData::from_file_path("./data/day02.txt");
+        let data = DayData::from_file_path("./data/day02.txt");
+        let lines: Vec<&str> = data.iter().collect();
         let with_two = lines
-            .iter()
+            .par_iter()
             .filter(|word| has_repeated_letters(word, 2))
             .count();
         let with_three = lines
-            .iter()
+            .par_iter()
             .filter(|word| has_repeated_letters(word, 3))
             .count();
         println!(
