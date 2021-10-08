@@ -27,7 +27,23 @@ impl AdventDay for DayTwo {
     }
 
     fn run_part_two(&self) {
-        todo!()
+        let data = DayData::from_file_path("./data/day02.txt");
+        let lines: Vec<&str> = data.iter().collect();
+
+        for x in lines.iter() {
+            for y in lines.iter() {
+                let (diff_by_one, common) = differ_by_one(x, y);
+                if diff_by_one {
+                    println!(
+                        "Pair different by one: {} and {} = {}",
+                        x,
+                        y,
+                        common.unwrap()
+                    );
+                    return;
+                }
+            }
+        }
     }
 }
 
@@ -46,6 +62,23 @@ fn has_repeated_letters(input: &str, count_required: u32) -> bool {
     !correct_counts.is_empty()
 }
 
+fn differ_by_one(left: &str, right: &str) -> (bool, Option<String>) {
+    let diffs: Vec<usize> = left
+        .chars()
+        .zip(right.chars())
+        .enumerate()
+        .filter(|(_pos, (a, b))| a != b)
+        .map(|(pos, _)| pos)
+        .collect();
+    if diffs.len() == 1 {
+        let split_position = diffs[0];
+        let common = left[..split_position].to_string() + &left[(split_position + 1)..];
+        (true, Some(common))
+    } else {
+        (false, None)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -61,5 +94,13 @@ mod tests {
     fn has_exactly_of_a_letter_works_returns_false() {
         assert!(!has_repeated_letters("abcdef", 2));
         assert!(!has_repeated_letters("abcdef", 3));
+    }
+
+    #[test]
+    fn differ_by_one_works() {
+        assert_eq!(
+            differ_by_one("fghij", "fguij"),
+            (true, Some("fgij".to_string()))
+        );
     }
 }
