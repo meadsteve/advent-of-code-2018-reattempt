@@ -32,15 +32,12 @@ impl AdventDay for DayTwo {
 
         for x in lines.iter() {
             for y in lines.iter() {
-                let (diff_by_one, common) = differ_by_one(x, y);
-                if diff_by_one {
-                    println!(
-                        "Pair different by one: {} and {} = {}",
-                        x,
-                        y,
-                        common.unwrap()
-                    );
-                    return;
+                match differ_by_one(x, y) {
+                    DiffResult::DiffByOne(common) => {
+                        println!("Pair different by one: {} and {} = {}", x, y, common);
+                        return;
+                    }
+                    DiffResult::Nope => continue,
                 }
             }
         }
@@ -59,7 +56,13 @@ fn has_repeated_letters(input: &str, count_required: u32) -> bool {
         .any(|&count| count == count_required)
 }
 
-fn differ_by_one(left: &str, right: &str) -> (bool, Option<String>) {
+#[derive(Debug, PartialEq)]
+enum DiffResult {
+    DiffByOne(String),
+    Nope,
+}
+
+fn differ_by_one(left: &str, right: &str) -> DiffResult {
     let diffs: Vec<usize> = left
         .chars()
         .zip(right.chars())
@@ -70,9 +73,9 @@ fn differ_by_one(left: &str, right: &str) -> (bool, Option<String>) {
     if diffs.len() == 1 {
         let split_position = diffs[0];
         let common = left[..split_position].to_string() + &left[(split_position + 1)..];
-        (true, Some(common))
+        DiffResult::DiffByOne(common)
     } else {
-        (false, None)
+        DiffResult::Nope
     }
 }
 
@@ -97,7 +100,7 @@ mod tests {
     fn differ_by_one_works() {
         assert_eq!(
             differ_by_one("fghij", "fguij"),
-            (true, Some("fgij".to_string()))
+            DiffResult::DiffByOne("fgij".to_string())
         );
     }
 }
