@@ -53,13 +53,10 @@ fn has_repeated_letters(input: &str, count_required: u32) -> bool {
         *total += 1;
         totals
     });
-    let correct_counts: Vec<&u32> = char_counts
+    char_counts
         .iter()
         .map(|(_, count)| count)
-        .filter(|&&count| count == count_required)
-        .take(1)
-        .collect();
-    !correct_counts.is_empty()
+        .any(|&count| count == count_required)
 }
 
 fn differ_by_one(left: &str, right: &str) -> (bool, Option<String>) {
