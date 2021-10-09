@@ -1,34 +1,24 @@
 use adventofcode2018_reattempt::day_01::DayOne;
 use adventofcode2018_reattempt::day_02::DayTwo;
 use adventofcode2018_reattempt::day_03::DayThree;
+use adventofcode2018_reattempt::day_04::DayFour;
 use adventofcode2018_reattempt::AdventDay;
 
-#[test]
-fn day_01_part_01() {
-    assert_eq!("Answer: 587", DayOne().run_part_one());
-}
+use test_case::test_case;
 
-#[test]
-fn day_01_part_02() {
-    assert_eq!("Answer: 83130", DayOne().run_part_two());
-}
-
-#[test]
-fn day_02_part_01() {
-    assert_eq!("Solution: 246 x 35 = 8610", DayTwo().run_part_one());
-}
-
-#[test]
-fn day_02_part_02() {
-    assert_eq!("Pair different by one: iosnxmfkpabcjpdywvrtaqhluy and iosnxmfkpabcjpdywvrtawhluy = iosnxmfkpabcjpdywvrtahluy", DayTwo().run_part_two());
-}
-
-#[test]
-fn day_03_part_01() {
-    assert_eq!("Double claimed: 116489", DayThree().run_part_one());
-}
-
-#[test]
-fn day_03_part_02() {
-    assert_eq!("Single claims: {ClaimId(1260)}", DayThree().run_part_two());
+#[test_case(Box::new(DayOne()), Some("Answer: 587"), Some("Answer: 83130"); "day one")]
+#[test_case(Box::new(DayTwo()), Some("Solution: 246 x 35 = 8610"), Some("Pair different by one: iosnxmfkpabcjpdywvrtaqhluy and iosnxmfkpabcjpdywvrtawhluy = iosnxmfkpabcjpdywvrtahluy"); "day two")]
+#[test_case(Box::new(DayThree()), Some("Double claimed: 116489"), Some("Single claims: {ClaimId(1260)}"); "day three")]
+#[test_case(Box::new(DayFour()), None, None; "day four")]
+fn test_the_days(
+    solution: Box<dyn AdventDay>,
+    day_one_sol: Option<&str>,
+    day_two_sol: Option<&str>,
+) {
+    if let Some(expectation) = day_one_sol {
+        assert_eq!(expectation, solution.run_part_one());
+    }
+    if let Some(expectation) = day_two_sol {
+        assert_eq!(expectation, solution.run_part_two());
+    }
 }
