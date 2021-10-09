@@ -12,8 +12,8 @@ impl AdventDay for DayThree {
         let cloth = lines
             .iter()
             .map(parse_line)
-            .fold(Cloth::new(), |mut cloth, (pos, size)| {
-                cloth.claim_area(pos, size);
+            .fold(Cloth::new(), |mut cloth, claim| {
+                cloth.claim_area(claim);
                 cloth
             });
         format!("Double claimed: {}", cloth.double_claims().len())
@@ -24,22 +24,23 @@ impl AdventDay for DayThree {
     }
 }
 
-fn parse_line(line: &str) -> (Position, Size) {
+fn parse_line(line: &str) -> Claim {
     lazy_static! {
         static ref LINE: Regex =
             Regex::new("#([0-9]+) @ ([0-9]+),([0-9]+): ([0-9]+)x([0-9]+)").unwrap();
     }
     if let Some(parsed) = LINE.captures(line) {
-        (
-            Position {
+        Claim {
+            id: parsed[1].parse::<usize>().unwrap(),
+            pos: Position {
                 x: parsed[2].parse::<usize>().unwrap(),
                 y: parsed[3].parse::<usize>().unwrap(),
             },
-            Size {
+            size: Size {
                 height: parsed[5].parse::<usize>().unwrap(),
                 width: parsed[4].parse::<usize>().unwrap(),
             },
-        )
+        }
     } else {
         panic!("Invalid line");
     }
@@ -55,6 +56,13 @@ struct Position {
 struct Size {
     width: usize,
     height: usize,
+}
+
+#[derive(Hash, PartialEq, Eq, Debug)]
+struct Claim {
+    id: usize,
+    pos: Position,
+    size: Size,
 }
 
 struct Cloth {
@@ -73,9 +81,11 @@ impl Cloth {
         *entry += 1;
     }
 
-    pub fn claim_area(&mut self, position: Position, size: Size) {
-        for x in position.x..position.x + size.width {
-            for y in position.y..position.y + size.height {
+    pub fn claim_area(&mut self, claim: Claim) {
+        let pos = claim.pos;
+        let size = claim.size;
+        for x in pos.x..pos.x + size.width {
+            for y in pos.y..pos.y + size.height {
                 self.claim(Position { x, y })
             }
         }
@@ -95,58 +105,46 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_one_claim_has_no_doubles() {
-        let mut cloth = Cloth::new();
-        cloth.claim(Position { x: 1, y: 1 });
-        assert_eq!(cloth.double_claims().len(), 0);
-    }
-
-    #[test]
-    fn test_overlapping_claims_are_countable() {
-        let mut cloth = Cloth::new();
-        cloth.claim(Position { x: 1, y: 1 });
-        cloth.claim(Position { x: 1, y: 2 });
-        cloth.claim(Position { x: 1, y: 1 });
-        assert_eq!(cloth.double_claims().len(), 1);
-    }
-
-    #[test]
     fn test_overlapping_area_claims_are_countable() {
         let mut cloth = Cloth::new();
-        cloth.claim_area(
-            Position { x: 1, y: 3 },
-            Size {
-                width: 4,
+        cloth.claim_area(Claim {
+            id: 1,
+            pos: Position { x: 1, y: 3 },
+            size: Size {
                 height: 4,
-            },
-        );
-        cloth.claim_area(
-            Position { x: 3, y: 1 },
-            Size {
                 width: 4,
-                height: 4,
             },
-        );
-        cloth.claim_area(
-            Position { x: 5, y: 5 },
-            Size {
-                width: 2,
+        });
+        cloth.claim_area(Claim {
+            id: 2,
+            pos: Position { x: 3, y: 1 },
+            size: Size {
+                height: 4,
+                width: 4,
+            },
+        });
+        cloth.claim_area(Claim {
+            id: 3,
+            pos: Position { x: 5, y: 5 },
+            size: Size {
                 height: 2,
+                width: 2,
             },
-        );
+        });
         assert_eq!(cloth.double_claims().len(), 4);
     }
 
     #[test]
     fn line_parsing_works() {
         assert_eq!(
-            (
-                Position { x: 3, y: 2 },
-                Size {
+            Claim {
+                id: 123,
+                pos: Position { x: 3, y: 2 },
+                size: Size {
                     height: 4,
                     width: 5
                 }
-            ),
+            },
             parse_line("#123 @ 3,2: 5x4")
         )
     }
