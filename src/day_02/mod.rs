@@ -7,7 +7,7 @@ use rayon::prelude::*;
 pub struct DayTwo();
 
 impl AdventDay for DayTwo {
-    fn run_part_one(&self) {
+    fn run_part_one(&self) -> String {
         let data = DayData::from_file_path("./data/day02.txt");
         let lines: Vec<&str> = data.iter().collect();
         let with_two = lines
@@ -18,15 +18,15 @@ impl AdventDay for DayTwo {
             .par_iter()
             .filter(|word| has_repeated_letters(word, 3))
             .count();
-        println!(
+        format!(
             "Solution: {} x {} = {}",
             with_two,
             with_three,
             with_two * with_three
-        );
+        )
     }
 
-    fn run_part_two(&self) {
+    fn run_part_two(&self) -> String {
         let data = DayData::from_file_path("./data/day02.txt");
         let lines: Vec<&str> = data.iter().collect();
 
@@ -34,13 +34,13 @@ impl AdventDay for DayTwo {
             for y in lines.iter() {
                 match differ_by_one(x, y) {
                     DiffResult::DiffByOne(common) => {
-                        println!("Pair different by one: {} and {} = {}", x, y, common);
-                        return;
+                        return format!("Pair different by one: {} and {} = {}", x, y, common);
                     }
                     DiffResult::Nope => continue,
                 }
             }
         }
+        "No matches".to_string()
     }
 }
 

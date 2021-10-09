@@ -6,16 +6,16 @@ use crate::AdventDay;
 pub struct DayOne();
 
 impl AdventDay for DayOne {
-    fn run_part_one(&self) {
+    fn run_part_one(&self) -> String {
         let lines = DayData::from_file_path("./data/day01.txt");
         let frequencies = lines.iter();
-        println!("Answer: {}", sum_frequencies(frequencies));
+        format!("Answer: {}", sum_frequencies(frequencies))
     }
 
-    fn run_part_two(&self) {
+    fn run_part_two(&self) -> String {
         let lines = DayData::from_file_path("./data/day01.txt");
         let frequencies = lines.iter();
-        println!("Answer: {}", repeated_total(frequencies).unwrap());
+        format!("Answer: {}", repeated_total(frequencies).unwrap())
     }
 }
 

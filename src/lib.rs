@@ -5,6 +5,6 @@ pub mod day_03;
 mod helpers;
 
 pub trait AdventDay {
-    fn run_part_one(&self);
-    fn run_part_two(&self);
+    fn run_part_one(&self) -> String;
+    fn run_part_two(&self) -> String;
 }
