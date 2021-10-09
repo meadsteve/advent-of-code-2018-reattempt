@@ -31,7 +31,7 @@ fn parse_line(line: &str) -> Claim {
     }
     if let Some(parsed) = LINE.captures(line) {
         Claim {
-            id: parsed[1].parse::<usize>().unwrap(),
+            id: ClaimId(parsed[1].parse::<usize>().unwrap()),
             pos: Position {
                 x: parsed[2].parse::<usize>().unwrap(),
                 y: parsed[3].parse::<usize>().unwrap(),
@@ -59,8 +59,11 @@ struct Size {
 }
 
 #[derive(Hash, PartialEq, Eq, Debug)]
+struct ClaimId(usize);
+
+#[derive(Hash, PartialEq, Eq, Debug)]
 struct Claim {
-    id: usize,
+    id: ClaimId,
     pos: Position,
     size: Size,
 }
@@ -108,7 +111,7 @@ mod tests {
     fn test_overlapping_area_claims_are_countable() {
         let mut cloth = Cloth::new();
         cloth.claim_area(Claim {
-            id: 1,
+            id: ClaimId(1),
             pos: Position { x: 1, y: 3 },
             size: Size {
                 height: 4,
@@ -116,7 +119,7 @@ mod tests {
             },
         });
         cloth.claim_area(Claim {
-            id: 2,
+            id: ClaimId(2),
             pos: Position { x: 3, y: 1 },
             size: Size {
                 height: 4,
@@ -124,7 +127,7 @@ mod tests {
             },
         });
         cloth.claim_area(Claim {
-            id: 3,
+            id: ClaimId(3),
             pos: Position { x: 5, y: 5 },
             size: Size {
                 height: 2,
@@ -138,7 +141,7 @@ mod tests {
     fn line_parsing_works() {
         assert_eq!(
             Claim {
-                id: 123,
+                id: ClaimId(123),
                 pos: Position { x: 3, y: 2 },
                 size: Size {
                     height: 4,
