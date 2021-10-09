@@ -1,5 +1,6 @@
 use adventofcode2018_reattempt::day_01::DayOne;
 use adventofcode2018_reattempt::day_02::DayTwo;
+use adventofcode2018_reattempt::day_03::DayThree;
 use adventofcode2018_reattempt::AdventDay;
 
 #[test]
@@ -20,4 +21,9 @@ fn day_02_part_01() {
 #[test]
 fn day_02_part_02() {
     assert_eq!("Pair different by one: iosnxmfkpabcjpdywvrtaqhluy and iosnxmfkpabcjpdywvrtawhluy = iosnxmfkpabcjpdywvrtahluy", DayTwo().run_part_two());
+}
+
+#[test]
+fn day_03_part_01() {
+    assert_eq!("Double claimed: 116489", DayThree().run_part_one());
 }
