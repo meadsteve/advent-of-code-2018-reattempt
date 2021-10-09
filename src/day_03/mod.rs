@@ -2,13 +2,26 @@ use crate::helpers::DayData;
 use crate::AdventDay;
 use lazy_static::lazy_static;
 use regex::Regex;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 pub struct DayThree();
 
 impl AdventDay for DayThree {
     fn run_part_one(&self) -> String {
         let lines = DayData::from_file_path("./data/day03.txt");
+        let cloth = DayThree::cloth_from_lines(lines);
+        format!("Double claimed: {}", cloth.double_claimed_positions().len())
+    }
+
+    fn run_part_two(&self) -> String {
+        let lines = DayData::from_file_path("./data/day03.txt");
+        let cloth = DayThree::cloth_from_lines(lines);
+        format!("Single claims: {:?}", cloth.single_claimants())
+    }
+}
+
+impl DayThree {
+    fn cloth_from_lines(lines: DayData) -> Cloth {
         let cloth = lines
             .iter()
             .map(parse_line)
@@ -16,11 +29,7 @@ impl AdventDay for DayThree {
                 cloth.claim_area(claim);
                 cloth
             });
-        format!("Double claimed: {}", cloth.double_claims().len())
-    }
-
-    fn run_part_two(&self) -> String {
-        todo!()
+        cloth
     }
 }
 
@@ -58,7 +67,7 @@ struct Size {
     height: usize,
 }
 
-#[derive(Hash, PartialEq, Eq, Debug)]
+#[derive(Hash, PartialEq, Eq, Debug, Clone)]
 struct ClaimId(usize);
 
 #[derive(Hash, PartialEq, Eq, Debug)]
@@ -69,19 +78,22 @@ struct Claim {
 }
 
 struct Cloth {
-    claims: HashMap<Position, usize>,
+    claims: HashMap<Position, HashSet<ClaimId>>,
+    all_claimants: HashSet<ClaimId>,
 }
 
 impl Cloth {
     fn new() -> Cloth {
         Cloth {
             claims: HashMap::new(),
+            all_claimants: HashSet::new(),
         }
     }
 
-    fn claim(&mut self, position: Position) {
-        let entry = self.claims.entry(position).or_insert(0);
-        *entry += 1;
+    fn claim(&mut self, position: Position, claim_id: ClaimId) {
+        self.all_claimants.insert(claim_id.clone());
+        let entry = self.claims.entry(position).or_insert_with(HashSet::new);
+        entry.insert(claim_id);
     }
 
     pub fn claim_area(&mut self, claim: Claim) {
@@ -89,16 +101,33 @@ impl Cloth {
         let size = claim.size;
         for x in pos.x..pos.x + size.width {
             for y in pos.y..pos.y + size.height {
-                self.claim(Position { x, y })
+                self.claim(Position { x, y }, claim.id.clone())
             }
         }
     }
 
-    pub fn double_claims(&self) -> Vec<&Position> {
+    pub fn double_claimed_positions(&self) -> Vec<&Position> {
         self.claims
             .iter()
-            .filter(|(_, &claims)| claims > 1)
+            .filter(|(_, claims)| claims.len() > 1)
             .map(|(pos, _)| pos)
+            .collect()
+    }
+
+    pub fn double_claimants(&self) -> HashSet<ClaimId> {
+        self.claims
+            .iter()
+            .filter(|(_, claims)| claims.len() > 1)
+            .flat_map(|(_, ids)| ids)
+            .cloned()
+            .collect()
+    }
+
+    pub fn single_claimants(&self) -> HashSet<ClaimId> {
+        let double_claimants = self.double_claimants();
+        self.all_claimants
+            .difference(&double_claimants)
+            .cloned()
             .collect()
     }
 }
@@ -134,7 +163,41 @@ mod tests {
                 width: 2,
             },
         });
-        assert_eq!(cloth.double_claims().len(), 4);
+        assert_eq!(cloth.double_claimed_positions().len(), 4);
+    }
+
+    #[test]
+    fn test_single_claimaints_can_be_found() {
+        let mut cloth = Cloth::new();
+        cloth.claim_area(Claim {
+            id: ClaimId(1),
+            pos: Position { x: 1, y: 3 },
+            size: Size {
+                height: 4,
+                width: 4,
+            },
+        });
+        cloth.claim_area(Claim {
+            id: ClaimId(2),
+            pos: Position { x: 3, y: 1 },
+            size: Size {
+                height: 4,
+                width: 4,
+            },
+        });
+        cloth.claim_area(Claim {
+            id: ClaimId(3),
+            pos: Position { x: 5, y: 5 },
+            size: Size {
+                height: 2,
+                width: 2,
+            },
+        });
+
+        let mut expected = HashSet::new();
+        expected.insert(ClaimId(3));
+
+        assert_eq!(cloth.single_claimants(), expected);
     }
 
     #[test]

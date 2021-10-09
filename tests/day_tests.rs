@@ -27,3 +27,8 @@ fn day_02_part_02() {
 fn day_03_part_01() {
     assert_eq!("Double claimed: 116489", DayThree().run_part_one());
 }
+
+#[test]
+fn day_03_part_02() {
+    assert_eq!("Single claims: {ClaimId(1260)}", DayThree().run_part_two());
+}
