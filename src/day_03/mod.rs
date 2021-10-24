@@ -22,14 +22,13 @@ impl AdventDay for DayThree {
 
 impl DayThree {
     fn cloth_from_lines(lines: DayData) -> Cloth {
-        let cloth = lines
+        lines
             .iter()
             .map(parse_line)
             .fold(Cloth::new(), |mut cloth, claim| {
                 cloth.claim_area(claim);
                 cloth
-            });
-        cloth
+            })
     }
 }
 
