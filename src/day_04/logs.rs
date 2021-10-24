@@ -37,11 +37,11 @@ pub struct LogEntry {
 }
 
 impl LogEntry {
-    pub fn from_line(line: &str) -> LogEntry {
+    pub fn from_line(line: String) -> LogEntry {
         lazy_static! {
             static ref LOG_ENTRY: Regex = Regex::new("\\[(.+)\\] (.+)").unwrap();
         }
-        let parts = LOG_ENTRY.captures(line).unwrap();
+        let parts = LOG_ENTRY.captures(&line).unwrap();
         LogEntry {
             datetime: NaiveDateTime::parse_from_str(&parts[1], "%Y-%m-%d %H:%M").unwrap(),
             event: LogEvent::from_entry_string(&parts[2]),
@@ -66,7 +66,7 @@ mod tests {
             event: LogEvent::Sleeps,
         };
         assert_eq!(
-            LogEntry::from_line("[1518-11-01 00:05] falls asleep"),
+            LogEntry::from_line("[1518-11-01 00:05] falls asleep".to_string()),
             expected
         );
     }
@@ -80,7 +80,10 @@ mod tests {
             ),
             event: LogEvent::Awakes,
         };
-        assert_eq!(LogEntry::from_line("[1518-11-01 00:10] wakes up"), expected);
+        assert_eq!(
+            LogEntry::from_line("[1518-11-01 00:10] wakes up".to_string()),
+            expected
+        );
     }
 
     #[test]
@@ -93,7 +96,7 @@ mod tests {
             event: LogEvent::ShiftStarts(GuardNumber(5)),
         };
         assert_eq!(
-            LogEntry::from_line("[1518-11-01 00:30] Guard #5 begins shift"),
+            LogEntry::from_line("[1518-11-01 00:30] Guard #5 begins shift".to_string()),
             expected
         );
     }

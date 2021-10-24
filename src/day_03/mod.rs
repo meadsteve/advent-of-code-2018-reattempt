@@ -33,12 +33,12 @@ impl DayThree {
     }
 }
 
-fn parse_line(line: &str) -> Claim {
+fn parse_line(line: String) -> Claim {
     lazy_static! {
         static ref LINE: Regex =
             Regex::new("#([0-9]+) @ ([0-9]+),([0-9]+): ([0-9]+)x([0-9]+)").unwrap();
     }
-    if let Some(parsed) = LINE.captures(line) {
+    if let Some(parsed) = LINE.captures(&line) {
         Claim {
             id: ClaimId(parsed[1].parse::<usize>().unwrap()),
             pos: Position {
@@ -211,7 +211,7 @@ mod tests {
                     width: 5
                 }
             },
-            parse_line("#123 @ 3,2: 5x4")
+            parse_line("#123 @ 3,2: 5x4".to_string())
         )
     }
 }

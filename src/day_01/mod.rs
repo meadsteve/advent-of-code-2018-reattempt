@@ -19,16 +19,16 @@ impl AdventDay for DayOne {
     }
 }
 
-fn sum_frequencies<'a, T>(frequencies: T) -> i64
+fn sum_frequencies<T>(frequencies: T) -> i64
 where
-    T: Iterator<Item = &'a str>,
+    T: Iterator<Item = String>,
 {
     frequencies.map(convert_to_int).sum()
 }
 
-fn repeated_total<'a, T>(frequencies: T) -> Option<i64>
+fn repeated_total<T>(frequencies: T) -> Option<i64>
 where
-    T: Iterator<Item = &'a str> + Clone,
+    T: Iterator<Item = String> + Clone,
 {
     let running_totals = frequencies
         .map(convert_to_int)
@@ -47,7 +47,7 @@ where
     None
 }
 
-fn convert_to_int(freq: &str) -> i64 {
+fn convert_to_int(freq: String) -> i64 {
     if let Some(value) = freq.strip_prefix('+') {
         value.parse::<i64>().unwrap()
     } else if let Some(value) = freq.strip_prefix('-') {
@@ -63,14 +63,20 @@ mod tests {
 
     #[test]
     fn it_can_sum_a_list_of_frequency_strings() {
-        let input = vec!["+1", "+3", "-2"];
+        let input = vec!["+1".to_string(), "+3".to_string(), "-2".to_string()];
         let sum = sum_frequencies(input.into_iter());
         assert_eq!(sum, 2);
     }
 
     #[test]
     fn it_returns_the_running_total_that_happens_twice() {
-        let input = vec!["+3", "+3", "+4", "-2", "-4"];
+        let input: Vec<String> = vec![
+            "+3".to_string(),
+            "+3".to_string(),
+            "+4".to_string(),
+            "-2".to_string(),
+            "-4".to_string(),
+        ];
         let repeated = repeated_total(input.into_iter()).unwrap();
         assert_eq!(repeated, 10);
     }
