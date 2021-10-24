@@ -3,22 +3,26 @@ use adventofcode2018_reattempt::day_02::DayTwo;
 use adventofcode2018_reattempt::day_03::DayThree;
 use adventofcode2018_reattempt::day_04::DayFour;
 use adventofcode2018_reattempt::AdventDay;
-use std::env;
+use structopt::StructOpt;
+
+#[derive(StructOpt)]
+struct CliArgs {
+    day: String,
+    part: String,
+}
 
 fn main() {
     println!("Hello, advent of code");
-    let args: Vec<String> = env::args().collect();
-    let day = &args[1];
-    let part = &args[2];
+    let args: CliArgs = CliArgs::from_args();
 
-    let solution: &(dyn AdventDay) = match &day[..] {
+    let solution: &(dyn AdventDay) = match &args.day[..] {
         "01" => &DayOne(),
         "02" => &DayTwo(),
         "03" => &DayThree(),
         "04" => &DayFour(),
         _ => panic!("That day has not been done"),
     };
-    let result = run_day(solution, part);
+    let result = run_day(solution, &args.part[..]);
     println!("{}", result);
 }
 
