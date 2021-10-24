@@ -23,7 +23,7 @@ impl AdventDay for DayThree {
 impl DayThree {
     fn cloth_from_lines(lines: DayData) -> Cloth {
         lines
-            .iter()
+            .lines()
             .map(parse_line)
             .fold(Cloth::new(), |mut cloth, claim| {
                 cloth.claim_area(claim);

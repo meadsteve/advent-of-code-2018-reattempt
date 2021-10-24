@@ -8,7 +8,7 @@ impl DayData {
         DayData(path.to_string())
     }
 
-    pub fn iter(&self) -> DayDataLineIterator {
+    pub fn lines(&self) -> DayDataLineIterator {
         DayDataLineIterator::new_from_path(&self.0)
     }
 }

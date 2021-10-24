@@ -12,7 +12,7 @@ pub struct DayFour();
 impl AdventDay for DayFour {
     fn run_part_one(&self) -> String {
         let mut entries: Vec<LogEntry> = DayData::from_file_path("./data/day04.txt")
-            .iter()
+            .lines()
             .map(LogEntry::from_line)
             .collect();
         entries.sort_by_key(|e| e.datetime);

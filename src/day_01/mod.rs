@@ -8,13 +8,13 @@ pub struct DayOne();
 impl AdventDay for DayOne {
     fn run_part_one(&self) -> String {
         let lines = DayData::from_file_path("./data/day01.txt");
-        let frequencies = lines.iter();
+        let frequencies = lines.lines();
         format!("Answer: {}", sum_frequencies(frequencies))
     }
 
     fn run_part_two(&self) -> String {
         let lines = DayData::from_file_path("./data/day01.txt");
-        let frequencies = lines.iter();
+        let frequencies = lines.lines();
         format!("Answer: {}", repeated_total(frequencies).unwrap())
     }
 }
@@ -23,7 +23,7 @@ fn sum_frequencies<T>(frequencies: T) -> i64
 where
     T: Iterator<Item = String>,
 {
-    frequencies.map(convert_to_int).sum()
+    frequencies.map(|s| convert_to_int(&s)).sum()
 }
 
 fn repeated_total<T>(frequencies: T) -> Option<i64>
@@ -31,7 +31,7 @@ where
     T: Iterator<Item = String> + Clone,
 {
     let running_totals = frequencies
-        .map(convert_to_int)
+        .map(|s| convert_to_int(&s))
         .cycle()
         .scan(0, |total, freq| {
             *total += freq;
@@ -47,7 +47,7 @@ where
     None
 }
 
-fn convert_to_int(freq: String) -> i64 {
+fn convert_to_int(freq: &str) -> i64 {
     if let Some(value) = freq.strip_prefix('+') {
         value.parse::<i64>().unwrap()
     } else if let Some(value) = freq.strip_prefix('-') {

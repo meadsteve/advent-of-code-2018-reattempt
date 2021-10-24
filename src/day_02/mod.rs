@@ -8,11 +8,11 @@ impl AdventDay for DayTwo {
     fn run_part_one(&self) -> String {
         let data = DayData::from_file_path("./data/day02.txt");
         let with_two = data
-            .iter()
+            .lines()
             .filter(|word| has_repeated_letters(word, 2))
             .count();
         let with_three = data
-            .iter()
+            .lines()
             .filter(|word| has_repeated_letters(word, 3))
             .count();
         format!(
@@ -26,8 +26,8 @@ impl AdventDay for DayTwo {
     fn run_part_two(&self) -> String {
         let data = DayData::from_file_path("./data/day02.txt");
 
-        for x in data.iter() {
-            for y in data.iter() {
+        for x in data.lines() {
+            for y in data.lines() {
                 match differ_by_one(&x, &y) {
                     DiffResult::DiffByOne(common) => {
                         return format!("Pair different by one: {} and {} = {}", x, y, common);
