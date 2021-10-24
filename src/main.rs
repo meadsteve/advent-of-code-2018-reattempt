@@ -7,7 +7,9 @@ use structopt::StructOpt;
 
 #[derive(StructOpt)]
 struct CliArgs {
+    #[structopt(short, long)]
     day: String,
+    #[structopt(short, long)]
     part: String,
 }
 
