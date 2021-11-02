@@ -9,7 +9,7 @@ use test_case::test_case;
 #[test_case(Box::new(DayOne()), Some("Answer: 587"), Some("Answer: 83130"); "day one")]
 #[test_case(Box::new(DayTwo()), Some("Solution: 246 x 35 = 8610"), Some("Pair different by one: iosnxmfkpabcjpdywvrtaqhluy and iosnxmfkpabcjpdywvrtawhluy = iosnxmfkpabcjpdywvrtahluy"); "day two")]
 #[test_case(Box::new(DayThree()), Some("Double claimed: 116489"), Some("Single claims: {ClaimId(1260)}"); "day three")]
-#[test_case(Box::new(DayFour()), Some("Guard number GuardNumber(3557) at minute 30"), None; "day four")]
+#[test_case(Box::new(DayFour()), Some("Guard number GuardNumber(3557) at minute 30"), Some("Guard number GuardNumber(269) at minute 39"); "day four")]
 fn test_the_days(
     solution: Box<dyn AdventDay>,
     day_one_sol: Option<&str>,

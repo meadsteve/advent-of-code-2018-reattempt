@@ -15,7 +15,7 @@ pub struct DayFour();
 impl AdventDay for DayFour {
     fn run_part_one(&self) -> String {
         let lines = DayData::from_file_path("./data/day04.txt").lines();
-        let final_state = Self::process_part_one(lines);
+        let final_state = Self::process_data(lines);
         let sleepiest_guard = final_state.find_sleepiest_guard().guard_number;
         let sleepiest_minute = final_state.sleepiest_minute(&sleepiest_guard);
         format!(
@@ -25,12 +25,18 @@ impl AdventDay for DayFour {
     }
 
     fn run_part_two(&self) -> String {
-        todo!()
+        let lines = DayData::from_file_path("./data/day04.txt").lines();
+        let final_state = Self::process_data(lines);
+        let result = final_state.find_the_guard_with_a_very_sleepy_time_of_night();
+        format!(
+            "Guard number {:?} at minute {}",
+            &result.guard_number, &result.sleepiest_minute
+        )
     }
 }
 
 impl DayFour {
-    pub fn process_part_one<T: Iterator<Item = String>>(lines: T) -> GuardsState {
+    pub fn process_data<T: Iterator<Item = String>>(lines: T) -> GuardsState {
         let mut entries: Vec<LogEntry> = lines
             .filter(|l| !l.is_empty())
             .map(LogEntry::from_line)
@@ -53,17 +59,35 @@ pub struct GuardsState {
     sleep_map: SleepMap,
 }
 
-pub struct GuardSleepStats {
+pub struct TotalSleepStats {
     total_minutes_slept: u32,
     guard_number: GuardNumber,
 }
 
-impl From<(&GuardNumber, &HashMap<u32, u32>)> for GuardSleepStats {
+impl From<(&GuardNumber, &HashMap<u32, u32>)> for TotalSleepStats {
     fn from((guard, sleep_map): (&GuardNumber, &HashMap<u32, u32>)) -> Self {
         let total_minutes_slept = sleep_map.values().sum();
-        GuardSleepStats {
+        TotalSleepStats {
             guard_number: guard.clone(),
             total_minutes_slept,
+        }
+    }
+}
+
+pub struct SleepiestMinute {
+    times_slept: u32,
+    sleepiest_minute: u32,
+    guard_number: GuardNumber,
+}
+
+impl From<(&GuardNumber, &HashMap<u32, u32>)> for SleepiestMinute {
+    fn from((guard, sleep_map): (&GuardNumber, &HashMap<u32, u32>)) -> Self {
+        let (sleepiest_minute, times_slept) =
+            sleep_map.iter().max_by(|(_, a), (_, b)| a.cmp(b)).unwrap();
+        SleepiestMinute {
+            guard_number: guard.clone(),
+            sleepiest_minute: *sleepiest_minute,
+            times_slept: *times_slept,
         }
     }
 }
@@ -92,10 +116,10 @@ impl GuardsState {
         self
     }
 
-    fn find_sleepiest_guard(&self) -> GuardSleepStats {
+    fn find_sleepiest_guard(&self) -> TotalSleepStats {
         self.sleep_map
             .iter()
-            .map(GuardSleepStats::from)
+            .map(TotalSleepStats::from)
             .max_by(|a, b| a.total_minutes_slept.cmp(&b.total_minutes_slept))
             .unwrap()
     }
@@ -106,6 +130,14 @@ impl GuardsState {
             .max_by(|(_, a), (_, b)| a.partial_cmp(b).unwrap())
             .unwrap();
         sleepiest_minute
+    }
+
+    fn find_the_guard_with_a_very_sleepy_time_of_night(&self) -> SleepiestMinute {
+        self.sleep_map
+            .iter()
+            .map(SleepiestMinute::from)
+            .max_by(|a, b| a.times_slept.cmp(&b.times_slept))
+            .unwrap()
     }
 }
 
@@ -157,12 +189,23 @@ mod tests {
         "#;
         Box::new(input.lines().map(|x| x.trim()).map(|x| x.to_string()))
     }
+
     #[test]
     fn test_finds_the_sleepiest_guard() {
         assert_eq!(
             GuardNumber(10),
-            DayFour::process_part_one(sample_lines())
+            DayFour::process_data(sample_lines())
                 .find_sleepiest_guard()
+                .guard_number
+        );
+    }
+
+    #[test]
+    fn test_find_the_guard_with_the_sleepiest_minute() {
+        assert_eq!(
+            GuardNumber(99),
+            DayFour::process_data(sample_lines())
+                .find_the_guard_with_a_very_sleepy_time_of_night()
                 .guard_number
         );
     }
@@ -171,7 +214,7 @@ mod tests {
     fn test_finds_the_sleepiest_minute_for_a_gaurd() {
         assert_eq!(
             24,
-            DayFour::process_part_one(sample_lines()).sleepiest_minute(&GuardNumber(10))
+            DayFour::process_data(sample_lines()).sleepiest_minute(&GuardNumber(10))
         );
     }
 }
