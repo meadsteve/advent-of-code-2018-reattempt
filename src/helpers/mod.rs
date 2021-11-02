@@ -11,6 +11,10 @@ impl DayData {
     pub fn lines(&self) -> DayDataLineIterator {
         DayDataLineIterator::new_from_path(&self.0)
     }
+
+    pub fn first_line(&self) -> String {
+        self.lines().next().expect("There was no first line")
+    }
 }
 
 pub struct DayDataLineIterator(String, Lines<BufReader<File>>);
