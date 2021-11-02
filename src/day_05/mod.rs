@@ -20,8 +20,9 @@ fn case_replace(input: &str) -> String {
         let next = letters.peek();
         if let Some((_, second)) = next {
             if first.to_uppercase().next() == second.to_uppercase().next() && &first != second {
-                let mut new_string = input.to_string();
-                new_string.replace_range(pos..pos + 2, "");
+                let mut new_string = String::new();
+                new_string.push_str(&input[..pos]);
+                new_string.push_str(&input[pos + 2..]);
                 return new_string;
             }
         }
