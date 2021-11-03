@@ -1,3 +1,5 @@
+mod linked_letters;
+
 use crate::helpers::DayData;
 use crate::AdventDay;
 
