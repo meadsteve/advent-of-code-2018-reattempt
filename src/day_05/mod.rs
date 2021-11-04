@@ -22,18 +22,36 @@ enum ReplacementResult {
 }
 
 fn case_replace(mut input: Vec<char>) -> ReplacementResult {
-    let mut letters = input.iter().enumerate().peekable();
-    while let Some((pos, first)) = letters.next() {
+    let pairs_to_remove = find_pair_to_remove(&input);
+    match pairs_to_remove.len() {
+        0 => ReplacementResult::Unchanged(input),
+        _ => {
+            for (x, y) in pairs_to_remove {
+                input[x] = ' ';
+                input[y] = ' ';
+            }
+            ReplacementResult::ReplacementsMade(input)
+        }
+    }
+}
+
+fn find_pair_to_remove(input: &[char]) -> Vec<(usize, usize)> {
+    let mut output = Vec::new();
+    let mut letters = input
+        .iter()
+        .enumerate()
+        .filter(|(_, &c)| c != ' ')
+        .peekable();
+    while let Some((pos_first, first)) = letters.next() {
         let next = letters.peek();
-        if let Some((_, second)) = next {
+        if let Some((pos_second, second)) = next {
             if first.to_uppercase().next() == second.to_uppercase().next() && &first != second {
-                input.remove(pos);
-                input.remove(pos);
-                return ReplacementResult::ReplacementsMade(input);
+                output.push((pos_first, *pos_second));
+                letters.next();
             }
         }
     }
-    ReplacementResult::Unchanged(input)
+    output
 }
 
 fn case_replace_repeat(input: String) -> String {
@@ -41,7 +59,9 @@ fn case_replace_repeat(input: String) -> String {
     loop {
         let result = case_replace(chars);
         match result {
-            ReplacementResult::Unchanged(answer) => return answer.into_iter().collect(),
+            ReplacementResult::Unchanged(answer) => {
+                return answer.into_iter().filter(|&c| c != ' ').collect()
+            }
             ReplacementResult::ReplacementsMade(next) => chars = next,
         }
     }
@@ -50,17 +70,6 @@ fn case_replace_repeat(input: String) -> String {
 #[cfg(test)]
 mod tests {
     use crate::day_05::*;
-
-    #[test]
-    fn test_replaces_differently_cased_pairs() {
-        let input = "bAaBcd".chars().collect();
-        let expected: Vec<char> = "bBcd".chars().collect();
-        if let ReplacementResult::ReplacementsMade(output) = case_replace(input) {
-            assert_eq!(expected, output)
-        } else {
-            panic!("Expected a change to be made")
-        }
-    }
 
     #[test]
     fn test_replaces_differently_cased_pairs_repeatedly() {
