@@ -2,6 +2,7 @@ mod linked_letters;
 
 use crate::helpers::DayData;
 use crate::AdventDay;
+use std::thread;
 
 pub struct DayFive();
 
@@ -12,7 +13,24 @@ impl AdventDay for DayFive {
     }
 
     fn run_part_two(&self) -> String {
-        todo!()
+        let input = DayData::from_file_path("./data/day05.txt").first_line();
+        let mut handles = Vec::new();
+        for c in 'a'..'z' {
+            let mut input_without_c = input.clone();
+            input_without_c = input_without_c.replace(c, "");
+            input_without_c = input_without_c.replace(c.to_uppercase().next().unwrap(), "");
+            handles.push(thread::spawn(move || {
+                println!(
+                    "result for {}: {}",
+                    c,
+                    case_replace_repeat(input_without_c).len()
+                )
+            }));
+        }
+        for handle in handles {
+            handle.join().unwrap();
+        }
+        "".to_string()
     }
 }
 
