@@ -66,7 +66,7 @@ struct Size {
     height: usize,
 }
 
-#[derive(Hash, PartialEq, Eq, Debug, Clone)]
+#[derive(Hash, PartialEq, Eq, Debug, Clone, Copy)]
 struct ClaimId(usize);
 
 #[derive(Hash, PartialEq, Eq, Debug)]
@@ -90,7 +90,7 @@ impl Cloth {
     }
 
     fn claim(&mut self, position: Position, claim_id: ClaimId) {
-        self.all_claimants.insert(claim_id.clone());
+        self.all_claimants.insert(claim_id);
         let entry = self.claims.entry(position).or_insert_with(HashSet::new);
         entry.insert(claim_id);
     }
@@ -100,7 +100,7 @@ impl Cloth {
         let size = claim.size;
         for x in pos.x..pos.x + size.width {
             for y in pos.y..pos.y + size.height {
-                self.claim(Position { x, y }, claim.id.clone())
+                self.claim(Position { x, y }, claim.id)
             }
         }
     }
