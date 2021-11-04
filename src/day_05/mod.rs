@@ -8,7 +8,7 @@ pub struct DayFive();
 impl AdventDay for DayFive {
     fn run_part_one(&self) -> String {
         let input = DayData::from_file_path("./data/day05.txt").first_line();
-        format!("the result: {}", case_replace_repeat(&input).len())
+        format!("the result: {}", case_replace_repeat(input).len())
     }
 
     fn run_part_two(&self) -> String {
@@ -16,31 +16,33 @@ impl AdventDay for DayFive {
     }
 }
 
-fn case_replace(input: &str) -> String {
-    let mut letters = input.chars().enumerate().peekable();
+enum ReplacementResult {
+    ReplacementsMade(Vec<char>),
+    Unchanged(Vec<char>),
+}
+
+fn case_replace(mut input: Vec<char>) -> ReplacementResult {
+    let mut letters = input.iter().enumerate().peekable();
     while let Some((pos, first)) = letters.next() {
         let next = letters.peek();
         if let Some((_, second)) = next {
             if first.to_uppercase().next() == second.to_uppercase().next() && &first != second {
-                let mut new_string = String::new();
-                new_string.push_str(&input[..pos]);
-                new_string.push_str(&input[pos + 2..]);
-                return new_string;
+                input.remove(pos);
+                input.remove(pos);
+                return ReplacementResult::ReplacementsMade(input);
             }
         }
     }
-    input.to_string()
+    ReplacementResult::Unchanged(input)
 }
 
-fn case_replace_repeat(input: &str) -> String {
-    let mut answer = input.to_string();
-    let mut next_answer;
+fn case_replace_repeat(input: String) -> String {
+    let mut chars: Vec<char> = input.chars().collect();
     loop {
-        next_answer = case_replace(&answer);
-        if next_answer == answer {
-            return next_answer;
-        } else {
-            answer = next_answer
+        let result = case_replace(chars);
+        match result {
+            ReplacementResult::Unchanged(answer) => return answer.into_iter().collect(),
+            ReplacementResult::ReplacementsMade(next) => chars = next,
         }
     }
 }
@@ -51,14 +53,20 @@ mod tests {
 
     #[test]
     fn test_replaces_differently_cased_pairs() {
-        assert_eq!("bBcd".to_string(), case_replace("bAaBcd"))
+        let input = "bAaBcd".chars().collect();
+        let expected: Vec<char> = "bBcd".chars().collect();
+        if let ReplacementResult::ReplacementsMade(output) = case_replace(input) {
+            assert_eq!(expected, output)
+        } else {
+            panic!("Expected a change to be made")
+        }
     }
 
     #[test]
     fn test_replaces_differently_cased_pairs_repeatedly() {
         assert_eq!(
             "dabCBAcaDA".to_string(),
-            case_replace_repeat("dabAcCaCBAcCcaDA")
+            case_replace_repeat("dabAcCaCBAcCcaDA".to_string())
         )
     }
 }
