@@ -3,7 +3,6 @@ mod linked_letters;
 use crate::helpers::DayData;
 use crate::AdventDay;
 use std::sync::{Arc, Mutex};
-use std::thread;
 
 pub struct DayFive();
 
@@ -15,21 +14,19 @@ impl AdventDay for DayFive {
 
     fn run_part_two(&self) -> String {
         let input = DayData::from_file_path("./data/day05.txt").first_line();
-        let mut handles = Vec::new();
         let results: Arc<Mutex<Vec<(char, usize)>>> = Arc::new(Mutex::new(Vec::new()));
+        let pool = threadpool::Builder::new().build();
         for c in 'a'..='z' {
             let mut input_without_c = input.clone();
             let local_results = Arc::clone(&results);
             input_without_c = input_without_c.replace(c, "");
             input_without_c = input_without_c.replace(c.to_uppercase().next().unwrap(), "");
-            handles.push(thread::spawn(move || {
+            pool.execute(move || {
                 let result = case_replace_repeat(input_without_c).len();
                 local_results.lock().unwrap().push((c, result));
-            }));
+            });
         }
-        for handle in handles {
-            handle.join().unwrap();
-        }
+        pool.join();
         results.lock().unwrap().sort_by(|(_, a), (_, b)| a.cmp(b));
         let answer = *results.lock().unwrap().first().unwrap();
         format!("Letter {} with {}", answer.0, answer.1)

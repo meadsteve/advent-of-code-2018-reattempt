@@ -11,6 +11,7 @@ structopt = "0.3.13"
 lazy_static = "1.4.0"
 regex = "1.5.4"
 chrono = "0.4.19"
+threadpool = "1.8.1"
 
 [dev-dependencies]
 test-case = "1.2.0"
