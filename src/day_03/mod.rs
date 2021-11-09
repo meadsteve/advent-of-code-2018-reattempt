@@ -3,6 +3,8 @@ use crate::AdventDay;
 use lazy_static::lazy_static;
 use regex::Regex;
 use std::collections::{HashMap, HashSet};
+use std::num::ParseIntError;
+use std::str::FromStr;
 
 pub struct DayThree();
 
@@ -24,33 +26,11 @@ impl DayThree {
     fn cloth_from_lines(lines: DayData) -> Cloth {
         lines
             .lines()
-            .map(parse_line)
+            .map(|l| l.parse().unwrap())
             .fold(Cloth::new(), |mut cloth, claim| {
                 cloth.claim_area(claim);
                 cloth
             })
-    }
-}
-
-fn parse_line(line: String) -> Claim {
-    lazy_static! {
-        static ref LINE: Regex =
-            Regex::new("#([0-9]+) @ ([0-9]+),([0-9]+): ([0-9]+)x([0-9]+)").unwrap();
-    }
-    if let Some(parsed) = LINE.captures(&line) {
-        Claim {
-            id: ClaimId(parsed[1].parse::<usize>().unwrap()),
-            pos: Position {
-                x: parsed[2].parse::<usize>().unwrap(),
-                y: parsed[3].parse::<usize>().unwrap(),
-            },
-            size: Size {
-                height: parsed[5].parse::<usize>().unwrap(),
-                width: parsed[4].parse::<usize>().unwrap(),
-            },
-        }
-    } else {
-        panic!("Invalid line");
     }
 }
 
@@ -69,11 +49,45 @@ struct Size {
 #[derive(Hash, PartialEq, Eq, Debug, Clone, Copy)]
 struct ClaimId(usize);
 
+impl FromStr for ClaimId {
+    type Err = ParseIntError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(ClaimId(s.parse::<usize>()?))
+    }
+}
+
 #[derive(Hash, PartialEq, Eq, Debug)]
 struct Claim {
     id: ClaimId,
     pos: Position,
     size: Size,
+}
+
+impl FromStr for Claim {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        lazy_static! {
+            static ref LINE: Regex =
+                Regex::new("#([0-9]+) @ ([0-9]+),([0-9]+): ([0-9]+)x([0-9]+)").unwrap();
+        }
+        if let Some(parsed) = LINE.captures(s) {
+            Ok(Claim {
+                id: parsed[1].parse().unwrap(),
+                pos: Position {
+                    x: parsed[2].parse::<usize>().unwrap(),
+                    y: parsed[3].parse::<usize>().unwrap(),
+                },
+                size: Size {
+                    height: parsed[5].parse::<usize>().unwrap(),
+                    width: parsed[4].parse::<usize>().unwrap(),
+                },
+            })
+        } else {
+            Err("Invalid line".to_string())
+        }
+    }
 }
 
 struct Cloth {
@@ -210,7 +224,7 @@ mod tests {
                     width: 5
                 }
             },
-            parse_line("#123 @ 3,2: 5x4".to_string())
+            "#123 @ 3,2: 5x4".parse::<Claim>().unwrap()
         )
     }
 }
