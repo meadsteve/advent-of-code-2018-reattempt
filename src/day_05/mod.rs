@@ -1,4 +1,4 @@
-use std::sync::{Arc, Mutex};
+use rayon::prelude::*;
 
 use crate::helpers::DayData;
 use crate::AdventDay;
@@ -15,26 +15,23 @@ impl AdventDay for DayFive {
 
     fn run_part_two(&self) -> String {
         let input = DayData::from_file_path("./data/day05.txt").first_line();
-        let results: Arc<Mutex<Vec<(char, usize)>>> = Arc::new(Mutex::new(Vec::new()));
-        let pool = threadpool::Builder::new().build();
-        for c in 'a'..='z' {
-            let mut input_without_c = input.clone();
-            let local_results = Arc::clone(&results);
-            input_without_c = input_without_c.replace(c, "");
-            input_without_c = input_without_c.replace(c.to_uppercase().next().unwrap(), "");
-            pool.execute(move || {
-                let result = replacer::remove_case_pairs(input_without_c).len();
-                local_results.lock().unwrap().push((c, result));
-            });
-        }
-        pool.join();
-        let mut results = results
-            .lock()
-            .expect("Problem occured getting the results from the threads");
-        results.sort_by(|(_, a), (_, b)| a.cmp(b));
-        let answer = *results
-            .first()
-            .expect("The results list was strangely empty");
+        let letters: Vec<char> = ('a'..='z').collect();
+        let mut answers: Vec<(char, usize)> = letters
+            .par_iter()
+            .map(|&c| {
+                let new_string = with_letter_removed(&input, c);
+                (c, replacer::remove_case_pairs(new_string).len())
+            })
+            .collect();
+        answers.sort_by(|(_, a), (_, b)| a.cmp(b));
+        let answer = answers.first().expect("No answers found");
         format!("Letter {} with {}", answer.0, answer.1)
     }
+}
+
+fn with_letter_removed(input: &str, letter: char) -> String {
+    let mut new_string = input.to_string();
+    new_string = new_string.replace(letter, "");
+    new_string = new_string.replace(letter.to_uppercase().next().unwrap(), "");
+    new_string
 }
