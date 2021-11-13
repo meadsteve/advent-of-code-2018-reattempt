@@ -30,10 +30,11 @@ enum Part {
 impl FromStr for Part {
     type Err = &'static str;
     fn from_str(day: &str) -> Result<Self, Self::Err> {
+        let day: u8 = day.parse().map_err(|_| "Must be a number")?;
         match day {
-            "01" => Ok(Part::One),
-            "02" => Ok(Part::Two),
-            _ => Err("Only 01 or 02 is valid"),
+            1 => Ok(Part::One),
+            2 => Ok(Part::Two),
+            _ => Err("Only 1 or 2 is valid"),
         }
     }
 }
