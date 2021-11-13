@@ -11,19 +11,19 @@ pub struct DayThree();
 impl AdventDay for DayThree {
     fn run_part_one(&self) -> String {
         let lines = DayData::from_file_path("./data/day03.txt");
-        let cloth = DayThree::cloth_from_lines(lines);
+        let cloth = Cloth::from(lines);
         format!("Double claimed: {}", cloth.double_claimed_positions().len())
     }
 
     fn run_part_two(&self) -> String {
         let lines = DayData::from_file_path("./data/day03.txt");
-        let cloth = DayThree::cloth_from_lines(lines);
+        let cloth = Cloth::from(lines);
         format!("Single claims: {:?}", cloth.single_claimants())
     }
 }
 
-impl DayThree {
-    fn cloth_from_lines(lines: DayData) -> Cloth {
+impl From<DayData> for Cloth {
+    fn from(lines: DayData) -> Self {
         lines
             .lines()
             .map(|l| l.parse().unwrap())
