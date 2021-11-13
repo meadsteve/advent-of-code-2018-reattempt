@@ -9,7 +9,7 @@ impl DayData {
     }
 
     pub fn lines(&self) -> DayDataLineIterator {
-        DayDataLineIterator::new_from_path(&self.0)
+        DayDataLineIterator::new(&self)
     }
 
     pub fn first_line(&self) -> String {
@@ -17,23 +17,23 @@ impl DayData {
     }
 }
 
-pub struct DayDataLineIterator(String, Lines<BufReader<File>>);
+pub struct DayDataLineIterator<'a>(&'a DayData, Lines<BufReader<File>>);
 
-impl DayDataLineIterator {
-    fn new_from_path(path: &str) -> DayDataLineIterator {
-        let f = File::open(path).expect("input not found");
+impl<'a> DayDataLineIterator<'a> {
+    fn new(data: &'a DayData) -> DayDataLineIterator {
+        let f = File::open(&data.0).expect("input not found");
         let f = BufReader::new(f);
-        DayDataLineIterator(path.to_string(), f.lines())
+        DayDataLineIterator(data, f.lines())
     }
 }
 
-impl Clone for DayDataLineIterator {
+impl<'a> Clone for DayDataLineIterator<'a> {
     fn clone(&self) -> Self {
-        DayDataLineIterator::new_from_path(&self.0)
+        DayDataLineIterator::new(self.0)
     }
 }
 
-impl Iterator for DayDataLineIterator {
+impl<'a> Iterator for DayDataLineIterator<'a> {
     type Item = String;
 
     fn next(&mut self) -> Option<Self::Item> {

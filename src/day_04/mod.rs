@@ -14,8 +14,8 @@ pub struct DayFour();
 
 impl AdventDay for DayFour {
     fn run_part_one(&self) -> String {
-        let lines = DayData::from_file_path("./data/day04.txt").lines();
-        let final_state = Self::process_data(lines);
+        let data = DayData::from_file_path("./data/day04.txt");
+        let final_state = Self::process_data(data.lines());
         let sleepiest_guard = final_state.find_sleepiest_guard().guard_number;
         let sleepiest_minute = final_state.sleepiest_minute(&sleepiest_guard);
         format!(
@@ -25,8 +25,8 @@ impl AdventDay for DayFour {
     }
 
     fn run_part_two(&self) -> String {
-        let lines = DayData::from_file_path("./data/day04.txt").lines();
-        let final_state = Self::process_data(lines);
+        let data = DayData::from_file_path("./data/day04.txt");
+        let final_state = Self::process_data(data.lines());
         let result = final_state.find_the_guard_with_a_very_sleepy_time_of_night();
         format!(
             "Guard number {:?} at minute {}",
