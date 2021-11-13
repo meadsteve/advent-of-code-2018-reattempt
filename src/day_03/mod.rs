@@ -152,60 +152,18 @@ mod tests {
     #[test]
     fn test_overlapping_area_claims_are_countable() {
         let mut cloth = Cloth::new();
-        cloth.claim_area(Claim {
-            id: ClaimId(1),
-            pos: Position { x: 1, y: 3 },
-            size: Size {
-                height: 4,
-                width: 4,
-            },
-        });
-        cloth.claim_area(Claim {
-            id: ClaimId(2),
-            pos: Position { x: 3, y: 1 },
-            size: Size {
-                height: 4,
-                width: 4,
-            },
-        });
-        cloth.claim_area(Claim {
-            id: ClaimId(3),
-            pos: Position { x: 5, y: 5 },
-            size: Size {
-                height: 2,
-                width: 2,
-            },
-        });
+        cloth.claim_area("#1 @ 1,3: 4x4".parse().unwrap());
+        cloth.claim_area("#2 @ 3,1: 4x4".parse().unwrap());
+        cloth.claim_area("#3 @ 5,5: 2x2".parse().unwrap());
         assert_eq!(cloth.double_claimed_positions().len(), 4);
     }
 
     #[test]
     fn test_single_claimaints_can_be_found() {
         let mut cloth = Cloth::new();
-        cloth.claim_area(Claim {
-            id: ClaimId(1),
-            pos: Position { x: 1, y: 3 },
-            size: Size {
-                height: 4,
-                width: 4,
-            },
-        });
-        cloth.claim_area(Claim {
-            id: ClaimId(2),
-            pos: Position { x: 3, y: 1 },
-            size: Size {
-                height: 4,
-                width: 4,
-            },
-        });
-        cloth.claim_area(Claim {
-            id: ClaimId(3),
-            pos: Position { x: 5, y: 5 },
-            size: Size {
-                height: 2,
-                width: 2,
-            },
-        });
+        cloth.claim_area("#1 @ 1,3: 4x4".parse().unwrap());
+        cloth.claim_area("#2 @ 3,1: 4x4".parse().unwrap());
+        cloth.claim_area("#3 @ 5,5: 2x2".parse().unwrap());
 
         let mut expected = HashSet::new();
         expected.insert(ClaimId(3));
